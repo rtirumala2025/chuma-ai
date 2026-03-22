@@ -1,29 +1,67 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import MessageBubble from './MessageBubble';
 
-export default function ChatWindow({ messages }) {
-  const bottomRef = useRef(null);
+export default function ChatWindow({ messages, isLoading, onSend, quickPrompts }) {
+  const messagesEndRef = React.useRef(null);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  React.useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-green-50/30">
+    <section className="relative flex-1 flex flex-col px-12 py-8 overflow-y-auto max-w-5xl mx-auto w-full">
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 grid-pattern pointer-events-none"></div>
+
       {messages.length === 0 ? (
-        <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 p-8">
-          <div className="w-16 h-16 bg-chumaGreen/10 rounded-full flex items-center justify-center mb-4">
-            <span className="text-2xl">🌱</span>
-          </div>
-          <h2 className="text-xl font-bold text-gray-700 mb-2">Welcome to Chuma</h2>
-          <p>I'm your AI financial coach. Load sample data or ask me a question to get started!</p>
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center">
+          <span className="text-6xl mb-6">📒</span>
+          <h2 className="font-headline italic text-3xl font-bold text-on-surface mb-3">
+            Your Ledger Awaits
+          </h2>
+          <p className="text-on-surface-variant font-body max-w-md mb-10">
+            Start a conversation with your AI financial coach. Ask about transactions, savings goals, or micro-loan readiness.
+          </p>
+
+          {/* Quick-Prompt Chips — prominent in empty state */}
+          {quickPrompts && quickPrompts.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-4">
+              {quickPrompts.map((prompt, i) => (
+                <button
+                  key={i}
+                  onClick={() => onSend(prompt)}
+                  disabled={isLoading}
+                  className="bg-surface-container-highest border-2 border-on-surface px-6 py-3 font-label text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-on-primary hover:translate-x-0.5 hover:translate-y-0.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
-        messages.map((msg, index) => (
-          <MessageBubble key={index} message={msg} />
-        ))
+        <div className="relative z-10 space-y-12 mb-20">
+          {messages.map((msg, i) => (
+            <MessageBubble key={i} role={msg.role} content={msg.content} />
+          ))}
+          {isLoading && (
+            <div className="group relative">
+              <div className="absolute -left-6 top-0 text-primary">⚡</div>
+              <div className="max-w-2xl">
+                <div className="bg-surface-container-low border-l-4 border-primary p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-primary animate-pulse"></div>
+                    <span className="font-label text-xs uppercase tracking-widest text-outline">
+                      Reviewing your ledger...
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
       )}
-      <div ref={bottomRef} />
-    </div>
+    </section>
   );
 }

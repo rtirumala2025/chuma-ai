@@ -1,60 +1,39 @@
 import React, { useState } from 'react';
 
 export default function InputBar({ onSend, isLoading, onLoadSampleData }) {
-  const [input, setInput] = useState('');
+  const [text, setText] = useState('');
 
-  const handleSend = () => {
-    if (input.trim() && !isLoading) {
-      onSend(input);
-      setInput('');
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.ctrlKey && e.key === 'Enter') {
-      handleSend();
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!text.trim() || isLoading) return;
+    onSend(text);
+    setText('');
   };
 
   return (
-    <div className="bg-white border-t border-gray-200 p-4 pb-6 sm:pb-4">
-      <div className="flex justify-between mb-2">
-        <button
-          onClick={() => {
-            const data = onLoadSampleData();
-            setInput(data);
-          }}
-          className="text-xs text-[#16A34A] font-medium hover:underline"
+    <div className="relative px-12 pb-8 pt-4 bg-surface/80 backdrop-blur-sm mt-auto max-w-5xl mx-auto w-full">
+      {/* Input Field */}
+      <form onSubmit={handleSubmit} className="relative group">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Write your entry in the ledger..."
           disabled={isLoading}
-        >
-          Load Sample Data
-        </button>
-        <span className="text-xs text-gray-400">Ctrl+Enter to send</span>
-      </div>
-      <div className="flex items-end space-x-2">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Type your message or load sample data..."
-          className="flex-1 max-h-32 min-h-[44px] bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#16A34A] focus:border-transparent resize-none"
-          rows={1}
-          disabled={isLoading}
+          className="w-full bg-surface-container-lowest border-2 border-on-surface px-6 py-6 font-body text-lg text-on-surface placeholder:text-outline/50 focus:ring-0 focus:border-primary transition-colors pr-24 outline-none disabled:opacity-50"
         />
-        <button
-          onClick={handleSend}
-          disabled={!input.trim() || isLoading}
-          className="bg-[#16A34A] hover:bg-[#15803d] disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-colors h-[48px] w-[48px] flex items-center justify-center shrink-0"
-        >
-          {isLoading ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-              <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
-            </svg>
-          )}
-        </button>
-      </div>
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center space-x-2">
+          <button
+            type="submit"
+            disabled={isLoading || !text.trim()}
+            className="p-3 bg-primary text-on-primary border-2 border-on-surface hover:bg-primary-container transition-colors active:translate-x-0.5 active:translate-y-0.5 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <span className="font-bold text-lg">›</span>
+          </button>
+        </div>
+      </form>
+      <p className="text-center font-label text-[9px] uppercase tracking-[0.2em] text-outline mt-4 opacity-40">
+        AI Coach may interpret data based on provided records. Maintain physical backups.
+      </p>
     </div>
   );
 }

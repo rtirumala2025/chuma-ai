@@ -1,8 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,700&family=Public+Sans:wght@300;400;600;700&family=Space+Grotesk:wght@300;500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #f0fdf4;
-  font-family: system-ui, -apple-system, sans-serif;
+@layer base {
+  body {
+    margin: 0;
+    font-family: 'Public Sans', sans-serif;
+    background-color: #fcf9f1;
+    color: #1c1c17;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Grid dot texture — subtle paper tooth */
+.grid-pattern {
+  background-image: radial-gradient(circle, #6e7b6c 1px, transparent 1px);
+  background-size: 16px 16px;
+  opacity: 0.08;
+}
+
+/* Finer grid for auth pages */
+.grid-pattern-fine {
+  background-image: radial-gradient(circle, #bdcaba 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Grid texture for landing page */
+.grid-texture {
+  background-image: radial-gradient(#6e7b6c 0.5px, transparent 0.5px);
+  background-size: 8px 8px;
+}
+
+/* Hard offset shadows — like thick cardstock */
+.hard-shadow {
+  box-shadow: 4px 4px 0 0 rgba(28, 28, 23, 0.2);
+}
+.hard-shadow-dark {
+  box-shadow: 4px 4px 0 0 #1c1c17;
+}
+.hard-shadow-lg {
+  box-shadow: 8px 8px 0 0 rgba(28, 28, 23, 0.15);
+}
+
+/* Active pressed state */
+.hard-shadow-active {
+  box-shadow: 1px 1px 0 0 rgba(28, 28, 23, 0.2);
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

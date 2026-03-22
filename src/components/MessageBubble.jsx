@@ -1,21 +1,34 @@
 import React from 'react';
 
-export default function MessageBubble({ message }) {
-  const isUser = message.role === 'user';
+export default function MessageBubble({ role, content }) {
+  if (role === 'assistant') {
+    return (
+      <div className="group relative">
+        {/* Bolt icon */}
+        <div className="absolute -left-6 top-0 text-primary font-bold">⚡</div>
+        <div className="max-w-2xl">
+          <div className="bg-surface-container-low border-l-4 border-primary p-6">
+            <p className="font-body text-lg leading-relaxed text-on-surface whitespace-pre-wrap">
+              {content}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
+  // User message
   return (
-    <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} mb-4`}>
-      {!isUser && (
-        <span className="text-xs text-gray-500 mb-1 ml-1 font-medium">Chuma</span>
-      )}
-      <div
-        className={`max-w-[80%] px-4 py-3 rounded-2xl whitespace-pre-wrap ${
-          isUser
-            ? 'bg-[#16A34A] text-white rounded-br-none'
-            : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-none'
-        }`}
-      >
-        {message.content}
+    <div className="flex justify-end relative">
+      <div className="max-w-xl w-full">
+        <div className="bg-primary text-on-primary border-2 border-on-surface p-6 shadow-[6px_6px_0px_0px_rgba(28,28,23,0.15)]">
+          <p className="font-body text-lg">
+            — {content}
+          </p>
+        </div>
+        <p className="font-label text-[10px] text-right mt-2 uppercase tracking-widest opacity-50">
+          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </p>
       </div>
     </div>
   );
