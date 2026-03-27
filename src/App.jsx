@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import LanguageToggle from './components/LanguageToggle';
 import ChatWindow from './components/ChatWindow';
 import InputBar from './components/InputBar';
-import { sendMessage } from './api';
-import { BWALYA_TRANSACTIONS } from './sampleData';
+import { sendMessage, translateMessage } from './api';
+import { sampleData } from './sampleData';
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -27,8 +27,36 @@ function App() {
     }
   };
 
+  const handleLanguageChange = async (newLanguage) => {
+    const oldLanguage = language;
+    setLanguage(newLanguage);
+    if (messages.length === 0) return;
+
+    setIsLoading(true);
+    try {
+      const translatedMessages = await Promise.all(
+        messages.map(async (msg) => {
+          if (msg.role === 'assistant') {
+            const translatedContent = await translateMessage(msg.content, newLanguage);
+            return { ...msg, content: translatedContent };
+          }
+          // If it's a user message and matches sample data for the old language, swap it
+          if (msg.role === 'user' && msg.content === sampleData[oldLanguage]) {
+            return { ...msg, content: sampleData[newLanguage] };
+          }
+          return msg;
+        })
+      );
+      setMessages(translatedMessages);
+    } catch (error) {
+      console.error('Error translating messages:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const loadSampleData = () => {
-    return BWALYA_TRANSACTIONS;
+    return sampleData[language];
   };
 
   return (
@@ -37,9 +65,9 @@ function App() {
         <span>Chuma AI</span>
         <span>🇿🇲</span>
       </div>
-      <LanguageToggle language={language} onLanguageChange={setLanguage} />
+      <LanguageToggle language={language} onLanguageChange={handleLanguageChange} />
       <ChatWindow messages={messages} />
-      <InputBar onSend={handleSend} isLoading={isLoading} onLoadSampleData={loadSampleData} />
+      <InputBar onSend={handleSend} isLoading={isLoading} onLoadSampleData={loadSampleData} language={language} />
     </div>
   );
 }

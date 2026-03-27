@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { sampleData } from '../sampleData';
 
-export default function InputBar({ onSend, isLoading, onLoadSampleData }) {
+export default function InputBar({ onSend, isLoading, onLoadSampleData, language }) {
   const [input, setInput] = useState('');
+
+  useEffect(() => {
+    // Check if the current input matches any of the sample data versions
+    const isSampleData = Object.values(sampleData).includes(input);
+    if (isSampleData) {
+      setInput(onLoadSampleData());
+    }
+  }, [language, onLoadSampleData]);
 
   const handleSend = () => {
     if (input.trim() && !isLoading) {
