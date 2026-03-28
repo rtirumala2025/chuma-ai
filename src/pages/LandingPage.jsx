@@ -1,6 +1,8 @@
 import React from 'react';
 
-export default function LandingPage({ navigate }) {
+import { useNavigate } from 'react-router-dom';
+export default function LandingPage() {
+  const navigate = useNavigate();
   return (
     <div className="bg-background text-on-surface font-body min-h-screen">
 
@@ -19,7 +21,7 @@ export default function LandingPage({ navigate }) {
           <button onClick={() => navigate('login')} className="text-on-surface text-sm font-label uppercase tracking-widest hover:text-primary transition-colors">
             Log In
           </button>
-          <button onClick={() => navigate('login')} className="bg-primary text-on-primary px-6 py-2 font-label text-xs uppercase tracking-widest font-bold border-2 border-on-surface hover:bg-primary-container transition-colors">
+          <button onClick={() => navigate('/chat')} className="bg-primary text-on-primary px-6 py-2 font-label text-xs uppercase tracking-widest font-bold border-2 border-on-surface hover:bg-primary-container transition-colors">
             Start Ledger
           </button>
         </div>
@@ -39,7 +41,7 @@ export default function LandingPage({ navigate }) {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
-                  onClick={() => navigate('login')}
+                  onClick={() => navigate('/chat')}
                   className="bg-primary text-on-primary font-headline italic font-bold text-xl px-10 py-4 border-2 border-on-surface hard-shadow active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
                 >
                   Start Your Ledger
@@ -173,7 +175,7 @@ export default function LandingPage({ navigate }) {
                     type="text"
                   />
                   <button
-                    onClick={() => navigate('login')}
+                    onClick={() => navigate('/chat')}
                     className="bg-primary text-on-primary px-8 py-4 font-label font-bold uppercase tracking-widest hover:bg-primary-container transition-colors"
                   >
                     Join the Ledger
