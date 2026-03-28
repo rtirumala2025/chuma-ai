@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { supabase } from './supabaseClient';
 import { initialMessages, BWALYA_TRANSACTIONS } from './sampleData';
 import { sendMessage } from './api';
 import ChatWindow from './components/ChatWindow';
@@ -6,27 +8,18 @@ import InputBar from './components/InputBar';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 
-const QUICK_PROMPTS = [
-  "Analyze my transactions",
-  "Am I ready for a loan?",
-  "How can I save more?"
-];
-
 const NAV_ITEMS = [
   { label: 'Home', icon: '🏠', active: true },
   { label: 'Dashboard', icon: '📊', active: false },
   { label: 'Settings', icon: '⚙️', active: false },
 ];
 
-function App() {
-  const [page, setPage] = useState('landing');
+function ChatDashboard() {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  const navigate = (target) => {
-    setPage(target);
-    window.scrollTo(0, 0);
-  };
+  const [checkingScam, setCheckingScam] = useState(false);
+  const [scamText, setScamText] = useState('');
 
   const handleSend = async (text) => {
     if (!text.trim() || isLoading) return;
@@ -52,28 +45,17 @@ function App() {
     return BWALYA_TRANSACTIONS;
   };
 
-  // ─── LANDING PAGE ───
-  if (page === 'landing') {
-    return <LandingPage navigate={navigate} />;
-  }
-
-  // ─── LOGIN PAGE ───
-  if (page === 'login') {
-    return <LoginPage navigate={navigate} />;
-  }
-
-  // ─── DASHBOARD ───
   return (
     <div className="flex h-screen w-full overflow-hidden bg-surface font-body">
 
       {/* ─── SIDE NAVBAR ─── */}
-      <aside className="fixed left-0 top-0 h-full flex flex-col z-40 bg-surface h-screen w-64 border-r-2 border-on-surface opacity-95">
+      <aside className="fixed left-0 top-0 h-full flex flex-col z-40 bg-surface w-64 border-r-2 border-on-surface opacity-95">
 
         {/* Brand Header */}
         <div className="px-6 py-8 border-b-2 border-on-surface">
           <h1 className="font-headline text-xl font-bold text-on-surface">The Ledger</h1>
           <p className="font-body font-bold uppercase tracking-widest text-[10px] mt-1 text-primary">
-            Chuma AI Coach
+            Your AI Fraud Guard for Mobile Money
           </p>
         </div>
 
@@ -117,7 +99,10 @@ function App() {
               <span className="mr-2">❓</span>Support
             </a>
             <button
-              onClick={() => navigate('landing')}
+              onClick={async () => {
+                await supabase.auth.signOut();
+                navigate('/');
+              }}
               className="flex items-center px-2 py-2 text-on-surface opacity-70 hover:opacity-100 text-xs font-body font-bold uppercase tracking-widest w-full text-left"
             >
               <span className="mr-2">↗</span>Logout
@@ -155,23 +140,72 @@ function App() {
         </header>
 
         {/* Chat Area */}
-        <ChatWindow messages={messages} isLoading={isLoading} onSend={handleSend} quickPrompts={QUICK_PROMPTS} />
+        <ChatWindow messages={messages} isLoading={isLoading} onSend={handleSend} quickPrompts={[]} />
 
         {/* Input Section */}
         <footer className="relative z-20">
-          {/* Quick-Prompt Chips — only visible in empty state */}
+          {/* Quick-Prompt UI */}
           {messages.length === 0 && (
-            <div className="flex gap-4 px-12 mb-4 overflow-x-auto pb-2 hide-scrollbar">
-              {QUICK_PROMPTS.map((prompt, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleSend(prompt)}
-                  disabled={isLoading}
-                  className="flex-none bg-surface-container-highest border-2 border-on-surface px-6 py-2 font-label text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-on-primary hover:translate-x-0.5 hover:translate-y-0.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  {prompt}
-                </button>
-              ))}
+            <div className="px-12 mb-4">
+              {!checkingScam ? (
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={() => setCheckingScam(true)}
+                    className="text-left bg-surface-container-highest border-2 border-on-surface w-fit px-6 py-3 font-label text-sm font-bold tracking-tight hover:bg-primary hover:text-on-primary transition-all rounded-md"
+                  >
+                    Check a suspicious message for scams
+                  </button>
+                  <button
+                    onClick={() => handleSend("Someone claiming to be an Airtel Money agent called me and asked for my PIN. Is this normal? What should I do?")}
+                    className="text-left bg-surface-container-highest border-2 border-on-surface w-fit px-6 py-3 font-label text-sm font-bold tracking-tight hover:bg-primary hover:text-on-primary transition-all rounded-md"
+                  >
+                    An agent asked for my PIN — is this normal?
+                  </button>
+                  <button
+                    onClick={() => handleSend("I think I was just scammed on Airtel Money and may have given someone my PIN. What do I do right now to protect my account?")}
+                    className="text-left bg-surface-container-highest border-2 border-on-surface w-fit px-6 py-3 font-label text-sm font-bold tracking-tight hover:bg-primary hover:text-on-primary transition-all rounded-md"
+                  >
+                    I think I was scammed — what do I do now?
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3 bg-surface-container-low border-2 border-on-surface p-4 max-w-2xl">
+                  <h3 className="font-headline font-bold text-lg mb-2">Paste the suspicious message:</h3>
+                  <textarea 
+                    value={scamText}
+                    onChange={(e) => setScamText(e.target.value)}
+                    className="w-full bg-surface border-2 border-on-surface p-3 font-body min-h-[100px] outline-none focus:border-primary"
+                    placeholder="Paste SMS or message here..."
+                  />
+                  <div className="flex flex-col gap-2 mt-2">
+                    <p className="font-label text-xs uppercase text-outline">Or load an example:</p>
+                    <button onClick={() => setScamText("AIRTEL MONEY: You have received K500.00 from 0976XXXXXX. To confirm receipt reply with your PIN to 5800. Ref: TXN29441")} className="text-left text-xs text-primary hover:underline">
+                      Load example 1
+                    </button>
+                    <button onClick={() => setScamText("Hello, I am an Airtel Money agent. Your account has been flagged. Send your PIN and NRC number to 0977-123-456 to verify your identity and avoid account suspension.")} className="text-left text-xs text-primary hover:underline">
+                      Load example 2
+                    </button>
+                    <button onClick={() => setScamText("MTN ALERT: Your SIM will be deactivated in 24hrs. Call 0800-111-222 and provide your account PIN to prevent this.")} className="text-left text-xs text-primary hover:underline">
+                      Load example 3
+                    </button>
+                  </div>
+                  <div className="flex gap-4 mt-4">
+                    <button
+                      onClick={() => {
+                        handleSend("Please check this message for scams: " + scamText);
+                        setCheckingScam(false);
+                      }}
+                      disabled={!scamText.trim() || isLoading}
+                      className="bg-primary text-on-primary font-bold tracking-tight px-6 py-2 disabled:opacity-50"
+                    >
+                      Check Message
+                    </button>
+                    <button onClick={() => { setCheckingScam(false); setScamText(''); }} className="text-on-surface-variant text-sm font-bold uppercase mt-2">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -180,6 +214,18 @@ function App() {
         </footer>
       </main>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/chat" element={<ChatDashboard />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

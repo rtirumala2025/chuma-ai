@@ -42,7 +42,7 @@ export default function LoginPage() {
                 CHUMA
               </div>
               <h1 className="font-headline italic text-5xl md:text-6xl text-primary leading-tight mb-6">
-                Join the <br/>Ledger.
+                Join the <br />Ledger.
               </h1>
               <p className="text-on-surface-variant text-lg leading-relaxed font-light">
                 The modern proprietor's companion. Secure your growth, track your grit, and build your legacy with Chuma AI.
@@ -65,21 +65,19 @@ export default function LoginPage() {
               <div className="flex gap-8 mb-10 border-b-2 border-outline-variant">
                 <button
                   onClick={() => setTab('signup')}
-                  className={`font-label text-sm uppercase tracking-widest pb-3 transition-colors ${
-                    tab === 'signup'
+                  className={`font-label text-sm uppercase tracking-widest pb-3 transition-colors ${tab === 'signup'
                       ? 'border-b-2 border-primary text-on-surface font-bold'
                       : 'text-on-surface-variant hover:text-on-surface'
-                  }`}
+                    }`}
                 >
                   Sign Up
                 </button>
                 <button
                   onClick={() => setTab('login')}
-                  className={`font-label text-sm uppercase tracking-widest pb-3 transition-colors ${
-                    tab === 'login'
+                  className={`font-label text-sm uppercase tracking-widest pb-3 transition-colors ${tab === 'login'
                       ? 'border-b-2 border-primary text-on-surface font-bold'
                       : 'text-on-surface-variant hover:text-on-surface'
-                  }`}
+                    }`}
                 >
                   Log In
                 </button>
